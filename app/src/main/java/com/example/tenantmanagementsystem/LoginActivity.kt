@@ -48,6 +48,8 @@ class LoginActivity : AppCompatActivity() {
             val intent =
                 Intent(this, MainActivity::class.java)
 
+            intent.putExtra("EMAIL", email)
+
             // Send email to MainActivity
             intent.putExtra(
                 "LOGIN_EMAIL",

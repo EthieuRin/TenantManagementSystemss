@@ -1,5 +1,7 @@
 package com.example.tenantmanagementsystem
 
+import android.util.Log
+import androidx.navigation.fragment.findNavController
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +34,23 @@ class DashboardFragment : Fragment() {
         val tenantCount = TenantRepository.tenants.size
         val totalRent = TenantRepository.totalRent()
 
+        binding.addTenantButton.setOnClickListener {
+            val action =
+                DashboardFragmentDirections
+                    .actionDashboardFragmentToAddTenantFragment()
+
+            findNavController().navigate(action)
+        }
+
+        binding.viewTenantsButton.setOnClickListener {
+            val action =
+                DashboardFragmentDirections
+                    .actionDashboardFragmentToViewTenantsFragment()
+
+            findNavController().navigate(action)
+        }
+
+
         binding.tenantCountTextView.text =
             "Tenants\n$tenantCount"
 
@@ -43,4 +62,37 @@ class DashboardFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onCreate")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onStop")
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("TENANT_LIFECYCLE", "DashboardFragment: onDestroy")
+    }
+
 }
