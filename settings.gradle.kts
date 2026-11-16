@@ -22,5 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TenantManagementSystem"
+rootProject.name = "TenantManagementSystemss"
 include(":app")
+ 
