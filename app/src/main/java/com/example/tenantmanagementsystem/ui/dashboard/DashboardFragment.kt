@@ -1,3 +1,4 @@
+
 package com.example.tenantmanagementsystem.ui.dashboard
 
 import android.os.Bundle
@@ -6,15 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-//import com.example.tenantmanagementsystem.DashboardFragmentDirections
-import com.example.tenantmanagementsystem.data.repository.TenantRepository
 import com.example.tenantmanagementsystem.databinding.FragmentDashboardBinding
+import com.example.tenantmanagementsystem.ui.viewmodel.TenantViewModel
 
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: TenantViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,8 +36,9 @@ class DashboardFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        val tenantCount = TenantRepository.tenants.size
-        val totalRent = TenantRepository.totalRent()
+        // Connect the layout to the shared ViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
         binding.addTenantButton.setOnClickListener {
             val action =
@@ -51,20 +55,12 @@ class DashboardFragment : Fragment() {
 
             findNavController().navigate(action)
         }
-
-
-        binding.tenantCountTextView.text =
-            "Tenants\n$tenantCount"
-
-        binding.totalRentTextView.text =
-            "Total rent\nKSh %,.0f".format(totalRent)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,10 +87,8 @@ class DashboardFragment : Fragment() {
         Log.d("TENANT_LIFECYCLE", "DashboardFragment: onStop")
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         Log.d("TENANT_LIFECYCLE", "DashboardFragment: onDestroy")
     }
-
 }
