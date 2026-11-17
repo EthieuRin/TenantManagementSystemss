@@ -1,21 +1,34 @@
 
 package com.example.tenantmanagementsystem.ui.viewmodel
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import com.example.tenantmanagementsystem.data.local.TenantDatabase
 import com.example.tenantmanagementsystem.data.model.Tenant
 import com.example.tenantmanagementsystem.data.repository.TenantRepository
+import kotlinx.coroutines.launch
 
-class TenantViewModel : ViewModel() {
+class TenantViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _tenants = MutableLiveData<List<Tenant>>(
-        TenantRepository.tenants.toList()
-    )
+    private val repository: TenantRepository
 
-    val tenants: LiveData<List<Tenant>> = _tenants
+    val tenants: LiveData<List<Tenant>>
+
+    init {
+        val tenantDao = TenantDatabase
+            .getDatabase(application)
+            .tenantDao()
+
+        repository = TenantRepository(tenantDao)
+
+        tenants = repository.allTenants
+
+        Log.d("TENANT_LIFECYCLE", "TenantViewModel: created")
+    }
 
     val tenantCountText: LiveData<String> = tenants.map { list ->
         "Tenants\n${list.size}"
@@ -25,6 +38,7 @@ class TenantViewModel : ViewModel() {
         val total = list.sumOf {
             it.rent.toDoubleOrNull() ?: 0.0
         }
+
         "Total rent\nKSh %,.0f".format(total)
     }
 
@@ -37,6 +51,7 @@ class TenantViewModel : ViewModel() {
     }
 
     fun addTenant(name: String, phone: String, rent: String): Tenant? {
+
         val cleanName = name.trim()
         val cleanPhone = phone.trim()
         val cleanRent = rent.trim()
@@ -50,14 +65,11 @@ class TenantViewModel : ViewModel() {
 
         val tenant = Tenant(cleanName, cleanPhone, cleanRent)
 
-        TenantRepository.addTenant(tenant)
-        _tenants.value = TenantRepository.tenants.toList()
+        viewModelScope.launch {
+            repository.addTenant(tenant)
+        }
 
         return tenant
-    }
-
-    init {
-        Log.d("TENANT_LIFECYCLE", "TenantViewModel: created")
     }
 
     override fun onCleared() {
@@ -65,4 +77,5 @@ class TenantViewModel : ViewModel() {
         Log.d("TENANT_LIFECYCLE", "TenantViewModel: onCleared")
     }
 }
+
 
